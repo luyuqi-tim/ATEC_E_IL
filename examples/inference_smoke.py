@@ -4,6 +4,8 @@ The black image and fixed joint state are synthetic. This checks the interface,
 model loading, and output shape; it does not measure task success.
 """
 
+import argparse
+import os
 from pathlib import Path
 import sys
 
@@ -14,6 +16,21 @@ from demo.solution import AlgSolution  # noqa: E402
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Check the Task E ACT inference interface.")
+    parser.add_argument(
+        "--checkpoint",
+        type=Path,
+        help="Optional local checkpoint; accepts a .pt file or the base path of three .part files.",
+    )
+    args = parser.parse_args()
+
+    if args.checkpoint is not None:
+        checkpoint = args.checkpoint.resolve()
+        parts = [Path(f"{checkpoint}.part{i:02d}") for i in range(3)]
+        if not checkpoint.is_file() and not all(part.is_file() for part in parts):
+            parser.error(f"Checkpoint not found: {checkpoint}")
+        os.environ["ATEC_TASK_E_POLICY"] = str(checkpoint)
+
     if not torch.cuda.is_available():
         raise SystemExit("This policy requires a CUDA GPU.")
 
