@@ -1,5 +1,7 @@
 # ATEC Task E · RGB and joint-state ACT policy
 
+> **Publication status:** The inference code is published. Model parts are not yet present in the repository, so the smoke test and simulator commands require the checkpoint to be added first.
+
 An inference-focused robotics project for the ATEC Task E tabletop scene. A Piper arm must place a sugar box, mustard bottle, and banana into a bin. This repository shows the policy interface, model architecture, and a checkpoint that can be inspected in a prepared Task E environment.
 
 > 中文简介：这是 ATEC Task E 三物体搬运任务的 ACT 推理展示版，重点呈现专家控制调试、标准观测接口和闭环评测中的工程取舍。
