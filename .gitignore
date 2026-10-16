@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.cache/
+datasets/
+logs/
+runs/
+*.hdf5
+*.h5
+*.csv
+*.mp4
+*.pth
+*.pt
+!models/task_e_act.pt
+
