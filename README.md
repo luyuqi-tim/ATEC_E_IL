@@ -32,7 +32,7 @@ flowchart LR
 | Packaged inference smoke test | 1 × 8 finite action from RGB + proprioception | Checks model loading and the public interface; it does not check manipulation. |
 | Generalization | Not established | Other placements can fail at the mustard stage. No multi-seed success claim is made. |
 
-The packaged model is an inference-only export of the selected EMA checkpoint. It contains model weights, normalization statistics, and time-feature settings. It contains no trajectory, optimizer state, or local data path.
+The packaged model is an inference-only export of the selected EMA checkpoint. It contains model weights, normalization statistics, and time-feature settings. It contains no trajectory, optimizer state, or local data path. For hosting, the exact checkpoint bytes are split into three parts; the inference adapter joins them in memory and checks SHA-256 before loading.
 
 ## Run the demo
 
@@ -44,7 +44,7 @@ Use a CUDA-enabled Python environment with compatible PyTorch, torchvision, and 
 python examples\inference_smoke.py
 ```
 
-Expected output ends with `PASS: observation -> (1, 8) finite action`. The script uses a synthetic black image; it is a package check, not a task score.
+Expected output ends with `PASS: observation -> (1, 8) finite action`. The script uses a synthetic black image; it is a package check, not a task score. If the model parts are not present, point it at a local checkpoint with `--checkpoint .\local_checkpoint.pt`.
 
 ### 2. Run in the simulator
 
@@ -58,6 +58,8 @@ python scripts\play_atec_task.py --task ATEC-TaskE-Piper --num_envs 1 --enable_c
 
 The score is printed by the simulator after the episode. The checkpoint path can also be supplied through `ATEC_TASK_E_POLICY`. A CUDA GPU and RGB camera observation are required by this policy.
 
+For a short presentation sequence and honest result framing, see the [interview demo guide](docs/DEMO_GUIDE.md).
+
 ## Repository contents
 
 ```text
@@ -65,11 +67,11 @@ demo/solution.py             Task E submission entry point
 demo/solution_act.py         observation adapter, startup/home logic, ACT inference
 demo/act/                   model and time-feature code needed for inference
 examples/inference_smoke.py  package-level interface check
-models/task_e_act.pt         inference-only checkpoint (66.7 MB)
+models/task_e_act.pt.part*   lossless parts of the inference checkpoint (66.7 MB total)
 LICENSE                      ATEC MIT notice
 ```
 
-SHA-256 of `models/task_e_act.pt`:
+SHA-256 after joining `models/task_e_act.pt.part00`, `.part01`, and `.part02`:
 
 ```text
 AA3E07136718F2CE3D63D52F293E688489EAB21185E302FF82D068BCCD32E8D0
