@@ -1,10 +1,14 @@
 # ATEC Task E · RGB and joint-state ACT policy
 
-> **Publication status:** The inference code is published. Model parts are not yet present in the repository, so the smoke test and simulator commands require the checkpoint to be added first.
+> **Publication status:** Inference code and a verified success video are public. Model weights and demonstration data are not included. Running inference requires a compatible local checkpoint and a prepared Task E environment.
 
 An inference-focused robotics project for the ATEC Task E tabletop scene. A Piper arm must place a sugar box, mustard bottle, and banana into a bin. This repository shows the policy interface, model architecture, and a local checkpoint adapter that can be inspected in a prepared Task E environment.
 
 > 中文简介：这是 ATEC Task E 三物体搬运任务的 ACT 推理展示版，重点呈现专家控制调试、标准观测接口和闭环评测中的工程取舍。
+
+## Successful rollout video
+
+[Watch the complete seed 100 ACT rollout (MP4, 61 s)](demo/task_e_seed100_success.mp4). The simulator run ended with **18/18** and `basket_success`. The video is cropped to keep the tabletop visible; no task state, terminal, or training data is overlaid. Seed 100 appeared in the demonstrations, so this shows a reproduced success, not unseen-scene generalization.
 
 ## What I built
 
@@ -32,7 +36,7 @@ flowchart LR
 | Packaged inference smoke test | 1 × 8 finite action from RGB + proprioception | Checks model loading and the public interface; it does not check manipulation. |
 | Generalization | Not established | Other placements can fail at the mustard stage. No multi-seed success claim is made. |
 
-An inference-only export of the selected EMA checkpoint has been prepared locally but is not published in this repository. It contains model weights, normalization statistics, and time-feature settings, with no trajectory, optimizer state, or local data path. The adapter accepts a local `.pt` file. It also supports three lossless `.part` files with SHA-256 verification if publication is approved later.
+Model weights are intentionally kept local. The public video records one complete in-distribution rollout; the repository does not provide a downloadable policy checkpoint.
 
 ## Run the demo
 
@@ -44,7 +48,7 @@ Use a CUDA-enabled Python environment with compatible PyTorch, torchvision, and 
 python examples\inference_smoke.py --checkpoint .\local_checkpoint.pt
 ```
 
-Expected output ends with `PASS: observation -> (1, 8) finite action`. The script uses a synthetic black image; it is a package check, not a task score. If the model parts are not present, point it at a local checkpoint with `--checkpoint .\local_checkpoint.pt`.
+Expected output ends with `PASS: observation -> (1, 8) finite action`. The script uses a synthetic black image; it is a package check, not a task score. Supply your own compatible local checkpoint with `--checkpoint`.
 
 ### 2. Run in the simulator
 
@@ -67,13 +71,8 @@ demo/solution.py             Task E submission entry point
 demo/solution_act.py         observation adapter, startup/home logic, ACT inference
 demo/act/                   model and time-feature code needed for inference
 examples/inference_smoke.py  package-level interface check
+demo/task_e_seed100_success.mp4  verified complete rollout video
 LICENSE                      ATEC MIT notice
-```
-
-SHA-256 of the prepared local inference-only checkpoint (not published here):
-
-```text
-AA3E07136718F2CE3D63D52F293E688489EAB21185E302FF82D068BCCD32E8D0
 ```
 
 ## Attribution and data handling

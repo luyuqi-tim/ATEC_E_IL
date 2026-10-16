@@ -1,13 +1,16 @@
 # Task E 面试演示指南
 
-这份仓库公开推理接口与模型结构。完整仿真需要预先配置好的 ATEC Task E / Isaac Lab 环境及其场景资产。
+这份仓库公开推理接口、模型结构与一段完整成功的仿真录像。模型权重不公开；本地复现需要预先配置好的 ATEC Task E / Isaac Lab 环境、场景资产及兼容的本机 checkpoint。
+
+[观看 seed 100 完整成功录像（MP4，约 61 秒）](../demo/task_e_seed100_success.mp4)。该回合实际终止于 `basket_success`，得分 18/18。视频只裁剪放大了工作台；seed 100 曾用于示范，不能据此推断未见场景成功率。
 
 ## 现场演示顺序（约 2 分钟）
 
-1. **接口检查。** 在本仓库运行 `python examples\inference_smoke.py --checkpoint <本机权重路径>`。展示输入只含 RGB 与 `proprio`，返回形状为 `(1, 8)` 的有限关节动作。这里使用合成黑图，只证明模型和接口可以加载。
-2. **结构说明。** 打开 [README](../README.md) 中的流程图：RGB 经 ResNet-18，关节位置与时间特征进入 ACT，预测 30 步动作块，按时间聚合后送入环境。
-3. **闭环任务。** 在已安装 Task E 的本机工程中运行其 `scripts/play_atec_task.py`，启用相机并指定 checkpoint。展示机械臂依次操作糖盒、芥末瓶、香蕉，以及终端的 `score` 和 `termination_reason`。
-4. **如实解释结果。** 已记录的 seed 100 回合曾达到 18/18 并触发 `basket_success`；该种子在示范中出现过，不能作为未见场景成功率。其他摆放可能在芥末瓶阶段抓空。
+1. **成功录像。** 播放上方视频，说明这是 seed 100 的一次完整成功回合，非跨种子成功率。
+2. **接口检查。** 在本仓库运行 `python examples\inference_smoke.py --checkpoint <本机权重路径>`。展示输入只含 RGB 与 `proprio`，返回形状为 `(1, 8)` 的有限关节动作。这里使用合成黑图，只证明模型和接口可以加载。
+3. **结构说明。** 打开 [README](../README.md) 中的流程图：RGB 经 ResNet-18，关节位置与时间特征进入 ACT，预测 30 步动作块，按时间聚合后送入环境。
+4. **闭环任务。** 在已安装 Task E 的本机工程中运行其 `scripts/play_atec_task.py`，启用相机并指定 checkpoint。展示机械臂依次操作糖盒、芥末瓶、香蕉，以及终端的 `score` 和 `termination_reason`。
+5. **如实解释结果。** 已记录的 seed 100 回合曾达到 18/18 并触发 `basket_success`；该种子在示范中出现过，不能作为未见场景成功率。其他摆放可能在芥末瓶阶段抓空。
 
 ## 面试时可讲的三个工程难点
 
@@ -31,5 +34,5 @@ $env:PYTHONPATH="$PWD\source\atec_rl_lab;$PWD"
 python scripts\play_atec_task.py --task ATEC-TaskE-Piper --num_envs 1 --enable_cameras --seed 100 --checkpoint .\local_checkpoint.pt
 ```
 
-公开仓库不包含仿真资产、训练轨迹、测试日志或私人路径。现场可用本机权重运行；如果公开权重后续加入仓库，README 中的默认路径也可直接使用。
+公开仓库不包含权重、仿真资产、训练轨迹、测试日志或私人路径。现场可用本机兼容权重运行。
 
