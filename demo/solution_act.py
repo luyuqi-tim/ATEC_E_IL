@@ -1,4 +1,7 @@
 import os
+import hashlib
+from io import BytesIO
+from pathlib import Path
 
 os.environ.setdefault(
     "TORCH_HOME", os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".cache", "torch"))
@@ -115,10 +118,21 @@ class AlgSolution:
             current_path, "..", "models", "task_e_act.pt",
         )
         checkpoint_path = os.path.abspath(checkpoint_path)
-        if not os.path.isfile(checkpoint_path):
-            raise FileNotFoundError(f"Task E checkpoint not found: {checkpoint_path}")
-        print(f"[INFO] ACT checkpoint: {checkpoint_path}", flush=True)
-        ckpt = torch.load(checkpoint_path, map_location=self.device, weights_only=True)
+        if os.path.isfile(checkpoint_path):
+            print(f"[INFO] ACT checkpoint: {checkpoint_path}", flush=True)
+            ckpt = torch.load(checkpoint_path, map_location=self.device, weights_only=True)
+        else:
+            part_paths = [f"{checkpoint_path}.part{i:02d}" for i in range(3)]
+            if not all(os.path.isfile(path) for path in part_paths):
+                raise FileNotFoundError(f"Task E checkpoint or parts not found: {checkpoint_path}")
+            checkpoint_bytes = b"".join(Path(path).read_bytes() for path in part_paths)
+            expected_sha256 = (
+                "aa3e07136718f2ce3d63d52f293e688489eab21185e302ff82d068bccd32e8d0"
+            )
+            if hashlib.sha256(checkpoint_bytes).hexdigest() != expected_sha256:
+                raise ValueError("Task E checkpoint parts failed SHA-256 verification")
+            print(f"[INFO] ACT checkpoint parts: {checkpoint_path}.part00-02", flush=True)
+            ckpt = torch.load(BytesIO(checkpoint_bytes), map_location=self.device, weights_only=True)
         norm_stats = ckpt["norm_stats"]
         state_dim  = norm_stats["state_mean"].shape[-1]
         act_dim    = norm_stats["action_mean"].shape[-1]
